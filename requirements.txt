@@ -1,0 +1,10 @@
+-e .
+torch==2.1.2
+megatron_core
+tensorstore==0.1.45
+zarr
+six
+regex
+pyyaml
+psutil
+numpy==1.24.1

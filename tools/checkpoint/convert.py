@@ -140,6 +140,8 @@ def main():
     queue = mp.Queue(maxsize=args.max_queue_size)
 
     print("Starting saver...")
+    #NOTE(fmom): if nothing get saved into `args.save_dir`, that means it crash (but the multiprocessing will not raise any error)
+    # In my case, it was because TransformerEngine wat not installed!
     saver_proc = mp.Process(target=saver.save_checkpoint, args=(queue, args))
     saver_proc.start()
 

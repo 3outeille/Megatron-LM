@@ -5,7 +5,7 @@ import os
 def main():
     parser = argparse.ArgumentParser(description="Run distributed training for GPT model")
     parser.add_argument("--tp", type=int, default=1, help="Tensor model parallel size")
-    parser.add_argument("--pp", type=int, default=4, help="Pipeline model parallel size")
+    parser.add_argument("--pp", type=int, default=1, help="Pipeline model parallel size")
     parser.add_argument("--nproc_per_node", type=int, default=1, help="Number of processes per node")
     parser.add_argument("--nnodes", type=int, default=1, help="Number of nodes")
     parser.add_argument("--node_rank", type=int, default=0, help="Rank of the node")
@@ -13,6 +13,7 @@ def main():
     parser.add_argument("--master_port", type=str, default="8000", help="Master node port")
     parser.add_argument("--tokenizer_model", type=str, required=True, help="Directory containing the tokenizer")
     parser.add_argument("--data_path", type=str, required=True, help="Path to the tokenized dataset")
+    parser.add_argument("--load_dir", type=str, required=True, help="Directory containing the model weights")
     parser.add_argument("--debug", action="store_true", help="Debug mode")
     args = parser.parse_args()
 
@@ -27,7 +28,7 @@ def main():
     
     # Construct the command
     if args.debug:
-        cmd = ["debugpy-run", "-m", "torch.distributed.run"] + distributed_args + ["../pretrain_gpt.py", "--"]
+        cmd = ["debugpy-run", "-m", "torch.distributed.run", "--"] +  distributed_args + ["../pretrain_gpt.py"]
     else:
         cmd = ["torchrun"] + distributed_args + ["../pretrain_gpt.py"]
 
@@ -38,7 +39,7 @@ def main():
         "--max-position-embeddings", "1024",
         "--tokenizer-type", "HuggingFaceTokenizer",
         "--tokenizer-model", args.tokenizer_model,
-        "--load", f"save_megatron_weights_TP{args.tp}_PP{args.pp}",
+        "--load", args.load_dir,
         "--exit-on-missing-checkpoint",
         "--use-checkpoint-args",
         "--no-load-optim",
@@ -65,7 +66,9 @@ def main():
         "--no-async-tensor-model-parallel-allreduce",
         "--lr", "0.0003",
         "--train-iters", "10",
-        "--data-path", args.data_path
+        "--eval-iters", "0",
+        "--log-interval", "1",
+        "--data-path", args.data_path,
     ]
 
     # Execute the command

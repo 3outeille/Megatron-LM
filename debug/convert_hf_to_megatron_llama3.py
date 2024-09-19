@@ -9,10 +9,12 @@ def main():
     parser.add_argument("--load-dir", type=str, required=True, help="Directory containing the HuggingFace model")
     parser.add_argument("--tokenizer-model", type=str, required=True, help="Directory containing the tokenizer")
     parser.add_argument("--debug", action="store_true", help="Debug mode")
+    parser.add_argument("--save_dir", type=str, default="save_megatron_weights", help="Directory to save the converted weights")
+    # Model details
     args = parser.parse_args()
 
     # Create the save directory name based on tp and pp values
-    save_dir = f"save_megatron_weights_TP{args.tp}_PP{args.pp}"
+    save_dir = args.save_dir + f"_TP{args.tp}_PP{args.pp}"
     
     # Ensure the save directory exists
     os.makedirs(save_dir, exist_ok=True)
@@ -34,7 +36,8 @@ def main():
         "--load-dir", args.load_dir,
         "--save-dir", save_dir,
         "--tokenizer-model", args.tokenizer_model,
-        "--model-size", "llama3-8B"
+        "--model-size", "llama3-8B",
+        "--num-layers", "4"
     ]
 
     # Execute the command

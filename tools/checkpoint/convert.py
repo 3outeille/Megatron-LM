@@ -114,6 +114,7 @@ def main():
     parser.add_argument('--model-type', type=str, required=True,
                         choices=['GPT', 'BERT'],
                         help='Type of the model')
+    parser.add_argument('--num-layers', type=int)
     parser.add_argument('--loader', type=str, default='megatron',
                         help='Module name to load checkpoint, should be on python path')
     parser.add_argument('--saver', type=str, default='megatron',

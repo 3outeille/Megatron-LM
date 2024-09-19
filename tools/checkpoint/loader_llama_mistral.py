@@ -302,7 +302,8 @@ def load_args_from_checkpoint(args):
     args.max_position_embeddings = model_args["max_position_embeddings"]
     args.hidden_size = model_args["hidden_size"]
     args.num_attention_heads = model_args["num_attention_heads"]
-    args.num_layers = model_args["num_hidden_layers"]
+    if args.num_layers is None:
+        args.num_layers = model_args["num_hidden_layers"]
     args.global_batch_size = 1024
     args.norm_epsilon = model_args["rms_norm_eps"]
     args.iteration = 1 # '0', 'release' don't work
@@ -456,6 +457,7 @@ def _load_checkpoint(queue, args):
 
     margs = parse_args()
     margs.tokenizer_model = args.tokenizer_model
+    margs.num_layers = args.num_layers
     load_args_from_checkpoint(margs)
 
     if "llama2" in args.model_size or "yi" in args.model_size:

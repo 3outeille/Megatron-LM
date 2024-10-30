@@ -1,3 +1,7 @@
+"""
+python finetune.py --pp 2 --nproc_per_node 4 --tokenizer_model ./download/llama3_tokenizer --data_path ./download/tokenized_dataset_text_document --load_dir save_4Lay
+ers_TP1_PP2/
+"""
 import argparse
 import subprocess
 import os
@@ -14,6 +18,7 @@ def main():
     parser.add_argument("--tokenizer_model", type=str, required=True, help="Directory containing the tokenizer")
     parser.add_argument("--data_path", type=str, required=True, help="Path to the tokenized dataset")
     parser.add_argument("--load_dir", type=str, required=True, help="Directory containing the model weights")
+    parser.add_argument("--ddp_bucket_size", type=int, default=25, help="DDP bucket size")
     parser.add_argument("--debug", action="store_true", help="Debug mode")
     args = parser.parse_args()
 
@@ -62,14 +67,19 @@ def main():
         "--swiglu",
         "--bf16",
         "--no-gradient-accumulation-fusion",
-        "--micro-batch-size", "1",
+        "--micro-batch-size", "20",
         "--no-async-tensor-model-parallel-allreduce",
         "--lr", "0.0003",
         "--train-iters", "10",
         "--eval-iters", "0",
         "--log-interval", "1",
         "--data-path", args.data_path,
+        #DDP settings
+        "--ddp-bucket-size", str(args.ddp_bucket_size),
+        "--overlap-grad-reduce",
     ]
+
+    print("Command to execute: ", cmd)
 
     # Execute the command
     try:

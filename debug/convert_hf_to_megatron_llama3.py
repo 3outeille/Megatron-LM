@@ -10,6 +10,7 @@ def main():
     parser.add_argument("--tokenizer-model", type=str, required=True, help="Directory containing the tokenizer")
     parser.add_argument("--debug", action="store_true", help="Debug mode")
     parser.add_argument("--save_dir", type=str, default="save_megatron_weights", help="Directory to save the converted weights")
+    parser.add_argument("--num-layers", type=int, default=4, help="Number of layers in the model")
     # Model details
     args = parser.parse_args()
 
@@ -37,7 +38,7 @@ def main():
         "--save-dir", save_dir,
         "--tokenizer-model", args.tokenizer_model,
         "--model-size", "llama3-8B",
-        "--num-layers", "4"
+        "--num-layers", str(args.num_layers)
     ]
 
     # Execute the command

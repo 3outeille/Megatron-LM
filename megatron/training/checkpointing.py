@@ -1055,7 +1055,17 @@ def load_checkpoint(model, optimizer, opt_param_scheduler, load_arg='load', stri
     else:
         for i in range(len(model)):
             mpu.set_virtual_pipeline_model_parallel_rank(i)
-            model[i].load_state_dict(state_dict['model%d' % i], strict=strict)
+            # model[i].load_state_dict(state_dict['model%d' % i], strict=strict) #NOTE: original megatron code (not working)
+            # Get the layer names that exist in this segment's model
+            model_keys = set(model[i].state_dict().keys())
+            
+            # Filter state dict to only include keys present in this segment
+            filtered_state_dict = {
+                k: v for k, v in state_dict["model"].items() 
+                if k in model_keys
+            }
+            
+            model[i].load_state_dict(filtered_state_dict, strict=strict)
 
     # Fix up query/key/value matrix ordering if needed.
     checkpoint_version = get_checkpoint_version()

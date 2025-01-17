@@ -67,16 +67,20 @@ def main():
         "--swiglu",
         "--bf16",
         "--no-gradient-accumulation-fusion",
-        "--micro-batch-size", "20",
+        "--global-batch-size", "40",
+        "--micro-batch-size", "10",
         "--no-async-tensor-model-parallel-allreduce",
         "--lr", "0.0003",
         "--train-iters", "10",
         "--eval-iters", "0",
         "--log-interval", "1",
         "--data-path", args.data_path,
-        #DDP settings
-        "--ddp-bucket-size", str(args.ddp_bucket_size),
-        "--overlap-grad-reduce",
+        # DDP settings
+        # "--ddp-bucket-size", str(args.ddp_bucket_size),
+        # "--overlap-grad-reduce",
+        # PP settings
+        "--no-overlap-p2p-communication",
+        "--num-layers-per-virtual-pipeline-stage", "2",
     ]
 
     print("Command to execute: ", cmd)
